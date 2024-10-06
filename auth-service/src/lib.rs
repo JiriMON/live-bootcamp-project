@@ -1,7 +1,7 @@
 use std::error::Error;
 use axum::{http::StatusCode, response::IntoResponse, routing::post, serve::Serve, Router};
 use tower_http::services::ServeDir;
- 
+
 pub mod routes;
 
 // This struct encapsulates our application-related logic.
@@ -14,16 +14,14 @@ pub struct Application {
 
 impl Application {
     pub async fn build(address: &str) -> Result<Self, Box<dyn Error>> {
-        // Move the Router definition from `main.rs` to here.
-        // Also, remove the `hello` route.
-        // We don't need it at this point!
+        
         let router = Router::new()
             .nest_service("/", ServeDir::new("assets"))
-            .route("/signup", post(signup))
-            .route("/login", post(login))
-            .route("/logout", post(logout))
-            .route("/verify-2fa", post(verify_2fa))
-            .route("/verify-token", post(verify_token));
+            .route("/signup", post(routes::signup))
+            .route("/login", post(routes::login))
+            .route("/logout", post(routes::logout))
+            .route("/verify-2fa", post(routes::verify_2fa))
+            .route("/verify-token", post(routes::verify_token));
 
         let listener = tokio::net::TcpListener::bind(address).await?;
         let address = listener.local_addr()?.to_string();
@@ -40,8 +38,7 @@ impl Application {
     }
 }
 
-// Example route handler.
-// For now we will simply return a 200 (OK) status code.
+
 
 
 
