@@ -42,7 +42,7 @@ impl HashmapUserStore {
         }
     }
 
-    // TODO: Implement a public method called `validate_user`, which takes an
+    // Implement a public method called `validate_user`, which takes an
     // immutable reference to self, an email string slice, and a password string slice
     // as arguments. `validate_user` should return a `Result` type containing either a
     // unit type `()` if the email/password passed in match an existing user, or a `UserStoreError`.
@@ -62,7 +62,7 @@ impl HashmapUserStore {
     }
 }
 
-// TODO: Add unit tests for your `HashmapUserStore` implementation
+//Add unit tests for your `HashmapUserStore` implementation
 #[cfg(test)]
 mod tests {
     use super::*;
