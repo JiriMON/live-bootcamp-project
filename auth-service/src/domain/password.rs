@@ -36,6 +36,11 @@ mod tests {
         let password = "1234567".to_owned();
         assert!(Password::parse(password).is_err());
     }
+    #[test]
+    fn string_more_than_8_characters_is_accepted() {
+        let password = "12345678".to_owned();
+        assert!(Password::parse(password).is_ok());
+    }
 
     #[derive(Debug, Clone)]
     struct ValidPasswordFixture(pub String);

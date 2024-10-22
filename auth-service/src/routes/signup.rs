@@ -10,7 +10,7 @@ use crate::{
 } */
 
 pub async fn signup(
-    // TODO: Use Axum's state extractor to pass in AppState
+    // Use Axum's state extractor to pass in AppState
     State(state): State<AppState>,
     Json(request): Json<SignupRequest>,
 ) -> impl IntoResponse {
@@ -18,13 +18,6 @@ pub async fn signup(
     let email = Email::parse(request.email.clone()).map_err(|_| AuthAPIError::InvalidCredentials)?;
     let password = Password::parse(request.password.clone()).map_err(|_| AuthAPIError::InvalidCredentials)?;
     
-        // TODO: early return AuthAPIError::InvalidCredentials if:
-    // - email is empty or does not contain '@'
-    // - password is less than 8 characters
-    
-   /*  if password.len() < 8 || !email.contains("@") {
-        return Err(AuthAPIError::InvalidCredentials)
-    } */
     
     let user = User::new(email, password, request.requires_2fa);
 

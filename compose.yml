@@ -1,6 +1,6 @@
 services:
   app-service:
-    # TODO: change "letsgetrusty" to your Docker Hub username
+    # change "letsgetrusty" to your Docker Hub username
     image: jirimon/app-service # specify name of image on Docker Hub
     restart: "always" # automatically restart container when server crashes
     environment: # set up environment variables
@@ -16,7 +16,7 @@ services:
       - web-root:/var/www/html
   
   auth-service:
-    # TODO: change "letsgetrusty" to your Docker Hub username
+    # change "letsgetrusty" to your Docker Hub username
     image: jirimon/auth-service
     restart: "always" # automatically restart container when server crashes
     ports:
