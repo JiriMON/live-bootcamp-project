@@ -10,6 +10,10 @@ cd ..
 ```
 
 ## Run servers locally (Manually)
+## Run servers locally (Docker)
+```bash
+./docker.sh
+```
 #### App service
 ```bash
 cd app-service
