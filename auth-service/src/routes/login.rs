@@ -21,9 +21,7 @@ pub async fn login(
     let password = match Password::parse(request.password){
         Ok(password) => password,
         Err(_) => return (jar, Err(AuthAPIError::InvalidCredentials))
-    };
-
- 
+    }; 
 
     let user_store = state.user_store.read().await;
 
