@@ -1,6 +1,6 @@
 [jobs.run]
 command = [
-    "cargo", "run",
+    "cargo", "run", "--target", "x86_64-pc-windows-gnu",
     "--color", "always",
     # put launch parameters for your program behind a `--` separator
 ]

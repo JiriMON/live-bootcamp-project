@@ -12,7 +12,7 @@ use serde::{Deserialize, Serialize};
 
 pub async fn verify_token(
     // Use Axum's state extractor to pass in AppState
-    State(_state): State<AppState>,
+    State(state): State<AppState>,
     Json(request): Json<VerifyRequest>,
 ) ->Result<impl IntoResponse, AuthAPIError> {
  
@@ -20,7 +20,7 @@ pub async fn verify_token(
         return Err(AuthAPIError::InvalidCredentials)
     }
 
-    if validate_token(&request.token).await.is_err() {
+    if validate_token(&request.token,state.banned_token_store).await.is_err() {
         return Err(AuthAPIError::InvalidToken)
     }
 
