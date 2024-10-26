@@ -12,8 +12,8 @@ services:
         condition: service_started
     networks:
       - app-network
-    # volumes:
-    #   - web-root:/var/www/html
+    volumes:
+      - web-root:/var/www/html
   
   auth-service:
     # change "letsgetrusty" to your Docker Hub username
@@ -25,45 +25,45 @@ services:
       - "3000:3000" # expose port 3000 so that applications outside the container can connect to it 
     networks:
       - app-network
-    # volumes:
-    #   - web-root:/var/www/html
+    volumes:
+      - web-root:/var/www/html
   
-#   webserver:
-#     image: nginx:mainline-alpine
-#     container_name: webserver
-#     restart: unless-stopped
-#     ports:
-#       - "80:80"
-#     volumes:
-#       - web-root:/var/www/html
-#       - ./nginx-conf:/etc/nginx/conf.d
-#       - certbot-etc:/etc/letsencrypt
-#       - certbot-var:/var/lib/letsencrypt
-#     depends_on:
-#       - auth-service
-#     networks:
-#       - app-network
+  webserver:
+    image: nginx:mainline-alpine
+    container_name: webserver
+    restart: unless-stopped
+    ports:
+      - "80:80"
+    volumes:
+      - web-root:/var/www/html
+      - ./nginx-conf:/etc/nginx/conf.d
+      - certbot-etc:/etc/letsencrypt
+      - certbot-var:/var/lib/letsencrypt
+    depends_on:
+      - auth-service
+    networks:
+      - app-network
   
-#   certbot:
-#     image: certbot/certbot
-#     container_name: certbot
-#     volumes:
-#       - certbot-etc:/etc/letsencrypt
-#       - certbot-var:/var/lib/letsencrypt
-#       - web-root:/var/www/html
-#     depends_on:
-#       - webserver
-#     command: certonly --webroot --webroot-path=/var/www/html --email jiri.moninec@gmpautomation.cz --agree-tos --no-eff-email --staging -d auth.gmpautomation.cz 
+  certbot:
+    image: certbot/certbot
+    container_name: certbot
+    volumes:
+      - certbot-etc:/etc/letsencrypt
+      - certbot-var:/var/lib/letsencrypt
+      - web-root:/var/www/html
+    depends_on:
+      - webserver
+    command: certonly --webroot --webroot-path=/var/www/html --email jiri.moninec@gmpautomation.cz --agree-tos --no-eff-email --staging -d auth.gmpautomation.cz 
 
-# volumes:
-#   certbot-etc:
-#   certbot-var:
-#   web-root:
-#     driver: local
-#     driver_opts:
-#       type: none
-#       device: /root/views/
-#       o: bind
+volumes:
+  certbot-etc:
+  certbot-var:
+  web-root:
+    driver: local
+    driver_opts:
+      type: none
+      device: /root/views/
+      o: bind
 
 networks:
   app-network:
