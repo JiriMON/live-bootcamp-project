@@ -41,10 +41,7 @@ impl BannedTokenStore for HashsetBannedTokenStore {
             let mut banned_token_store = HashsetBannedTokenStore::default();
             let token = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhQGJjLmN6IiwiZXhwIjoxNzI5NzU0MjI2fQ.o6Tm7n8P2INdNKmVqFdefbVOw6Gb9S4aHBvF_buQZ_M".to_string();
     
-   
-            banned_token_store.add_token_to_banned_store(token.clone()).await;
-            
-    
+            let _ = banned_token_store.add_token_to_banned_store(token.clone()).await;
      
             let result = banned_token_store.verify_token_in_banned_store(&token).await;
             assert!(result.is_ok());

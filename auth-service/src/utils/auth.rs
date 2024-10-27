@@ -3,7 +3,7 @@ use chrono::Utc;
 use jsonwebtoken::{decode, encode, DecodingKey, EncodingKey, Validation};
 use serde::{Deserialize, Serialize};
 use super::constants::{JWT_COOKIE_NAME, JWT_SECRET};
-use crate::{app_state::BannedTokenStoreType, domain::{email::Email, BannedTokenStore}};
+use crate::{app_state::BannedTokenStoreType, domain::email::Email};
 
 
 
@@ -104,7 +104,7 @@ mod tests {
 
     use tokio::sync::RwLock;
 
-    use crate::services::hashset_banned_token_store::HashsetBannedTokenStore;
+    use crate::{domain::BannedTokenStore, services::hashset_banned_token_store::HashsetBannedTokenStore};
 
     use super::*;
 
