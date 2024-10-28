@@ -1,12 +1,11 @@
+use axum::{extract::State, http::StatusCode, response::IntoResponse, Json};
+use serde::{Deserialize, Serialize};
+use axum_extra::extract::CookieJar;
 use crate::{
     app_state::AppState,
     domain::{AuthAPIError, Email, Password, User, LoginAttemptId, TwoFACode},
     utils::auth::generate_auth_cookie,
 };
-use axum::{extract::State, http::StatusCode, response::IntoResponse, Json};
-use serde::{Deserialize, Serialize};
-use axum_extra::extract::CookieJar;
-
 
 
 pub async fn login(

@@ -2,7 +2,7 @@ use std::sync::Arc;
 use tokio::sync::RwLock;
 use reqwest::cookie::Jar;
 use auth_service::{
-    app_state::{AppState, BannedTokenStoreType, EmailClientType, TwoFACodeStoreType}, 
+    app_state::{AppState, BannedTokenStoreType, TwoFACodeStoreType}, 
     services::{
         hashmap_two_fa_code_store::HashmapTwoFACodeStore, 
         hashmap_user_store::HashmapUserStore, 
@@ -19,8 +19,7 @@ pub struct TestApp {
     pub cookie_jar: Arc<Jar>,
     pub banned_token_store: BannedTokenStoreType,
     pub two_fa_code_store: TwoFACodeStoreType,
-    pub http_client: reqwest::Client,
-    pub email_client: EmailClientType
+    pub http_client: reqwest::Client, 
 }
 
 impl TestApp {
@@ -55,7 +54,6 @@ impl TestApp {
             banned_token_store,
             two_fa_code_store,
             http_client,
-            email_client,
         }
     }
 
@@ -99,12 +97,16 @@ impl TestApp {
             .expect("Failed to execute request.")
     }
 
-    pub async fn post_verify_2fa(&self) -> reqwest::Response {
-        self.http_client
-            .post(&format!("{}/verify-2fa", &self.address))
-            .send()
-            .await
-            .expect("Failed to execute request.")
+    pub async fn post_verify_2fa<Body>(&self, body: &Body) -> reqwest::Response 
+        where
+          Body: serde::Serialize
+        {
+            self.http_client
+                .post(&format!("{}/verify-2fa", &self.address))
+                .json(body)
+                .send()
+                .await
+                .expect("Failed to execute request.")
     }
 
     pub async fn post_verify_token<Body>(&self, body: &Body) -> reqwest::Response

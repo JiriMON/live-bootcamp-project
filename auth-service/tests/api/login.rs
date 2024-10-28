@@ -71,7 +71,7 @@ async fn should_return_206_if_valid_credentials_and_2fa_enabled() {
 
     assert_eq!(json_body.message, "Two factor authentification required".to_owned());
 
-    // TODO: assert that `json_body.login_attempt_id` is stored inside `app.two_fa_code_store`
+    // assert that `json_body.login_attempt_id` is stored inside `app.two_fa_code_store`
     let two_fa_code_store = app.two_fa_code_store.read().await;
 
     let code_tuple = two_fa_code_store
