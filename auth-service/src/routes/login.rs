@@ -92,7 +92,11 @@ async fn handle_2fa(
     if state.two_fa_code_store.write().await.add_code(email.clone(), login_attempt_id.clone(), two_fa_code.clone()).await.is_err(){
         return (jar,Err(AuthAPIError::UnexpectedError));
     }
-    
+    // send 2FA code via the email client. Return `AuthAPIError::UnexpectedError` if the operation fails.
+
+    if state.email_client.write().await.send_email(email, "2FA code for your login", two_fa_code.as_ref()).await.is_err(){
+        return (jar,Err(AuthAPIError::UnexpectedError));
+    }
 
     let response = 
         Json(LoginResponse::TwoFactorAuth(TwoFactorAuthResponse { 

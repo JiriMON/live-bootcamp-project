@@ -12,7 +12,7 @@ pub struct HashmapTwoFACodeStore {
     codes: HashMap<Email, (LoginAttemptId, TwoFACode)>,
 }
 
-// TODO: implement TwoFACodeStore for HashmapTwoFACodeStore
+// implement TwoFACodeStore for HashmapTwoFACodeStore
 #[async_trait::async_trait]
 impl TwoFACodeStore for HashmapTwoFACodeStore {
     async fn add_code(
