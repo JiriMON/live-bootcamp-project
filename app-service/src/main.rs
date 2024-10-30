@@ -67,6 +67,7 @@ async fn protected(jar: CookieJar) -> impl IntoResponse {
     let auth_hostname = env::var("AUTH_SERVICE_HOST_NAME").unwrap_or("0.0.0.0".to_owned());
     //let url = format!("http://{}:3000/verify-token", auth_hostname);
     let url = format!("{}verify-token", auth_hostname);
+    println!("{}",url);
     let response = match api_client.post(&url).json(&verify_token_body).send().await {
         Ok(response) => response,
         Err(_) => {
@@ -74,6 +75,8 @@ async fn protected(jar: CookieJar) -> impl IntoResponse {
         }
     };
 
+    println!("{:?}",response);
+    
     match response.status() {
         reqwest::StatusCode::UNAUTHORIZED | reqwest::StatusCode::BAD_REQUEST => {
             StatusCode::UNAUTHORIZED.into_response()
