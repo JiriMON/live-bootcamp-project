@@ -95,7 +95,7 @@ jobs:
           cd ~
           export JWT_SECRET=${{ secrets.JWT_SECRET }}
           export AUTH_SERVICE_IP=${{ vars.DROPLET_IP }}
-          export AUTH_SERVICE_HOSTNAME=${{ vars.AUTH_SERVICE_HOSTNAME }}
+          export AUTH_SERVICE_HOSTNAME=${{ secrets.AUTH_SERVICE_HOSTNAME }}
           docker compose down
           docker compose pull
           docker compose up -d
