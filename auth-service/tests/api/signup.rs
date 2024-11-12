@@ -3,7 +3,7 @@ use auth_service::{routes::SignupResponse, ErrorResponse};
 
 #[tokio::test]
 async fn should_return_201_if_valid_input() {
-    let app = TestApp::new().await;
+    let mut app = TestApp::new().await;
 
     let random_email = get_random_email();
 
@@ -28,6 +28,7 @@ async fn should_return_201_if_valid_input() {
             .expect("Could not deserialize response body to UserBody"),
         expected_response
     );
+    app.clean_up().await;
 }
 
 #[tokio::test]
@@ -39,7 +40,7 @@ async fn should_return_400_if_invalid_input() {
 
     // Create an array of invalid inputs. Then, iterate through the array and 
     // make HTTP calls to the signup route. Assert a 400 HTTP status code is returned.
-    let app = TestApp::new().await;
+    let mut app = TestApp::new().await;
 
     let random_email = get_random_email();
 
@@ -84,12 +85,13 @@ async fn should_return_400_if_invalid_input() {
             "Invalid credentials".to_owned()
         );
     }
+    app.clean_up().await;
 }
 
 #[tokio::test]
 async fn should_return_409_if_email_already_exists() {
     // Call the signup route twice. The second request should fail with a 409 HTTP status code    
-    let app = TestApp::new().await;
+    let mut app = TestApp::new().await;
 
     let random_email = get_random_email();
 
@@ -114,12 +116,13 @@ async fn should_return_409_if_email_already_exists() {
             .error,
         "User already exists".to_owned()
     );
+    app.clean_up().await;
 }
 
 
 #[tokio::test]
 async fn should_return_422_if_malformed_input() {
-    let app = TestApp::new().await;
+    let mut app = TestApp::new().await;
 
     let random_email = get_random_email(); // Call helper method to generate email 
 
@@ -149,5 +152,6 @@ async fn should_return_422_if_malformed_input() {
             test_case
         );
     }
+    app.clean_up().await;
 }
 
