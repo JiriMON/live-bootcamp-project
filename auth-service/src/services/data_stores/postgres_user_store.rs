@@ -87,7 +87,7 @@ async fn verify_password_hash(
     expected_password_hash: String,
     password_candidate: String,
 ) -> Result<(), Box<dyn Error + Send + Sync>> {
-    let result = task::spawn_blocking(move|| {
+    let result = task::spawn_blocking(move || {
         let expected_password_hash: PasswordHash<'_> = PasswordHash::new(&expected_password_hash)?;
    
         Argon2::default()
@@ -104,7 +104,7 @@ async fn verify_password_hash(
 // separate thread pool using tokio::task::spawn_blocking. Note that you
 // will need to update the input parameters to be String types instead of &str
 async fn compute_password_hash(password: String) -> Result<String, Box<dyn Error + Send + Sync>> {
-    let result = task::spawn_blocking(move|| {
+    let result = task::spawn_blocking( move || {
         let salt: SaltString = SaltString::generate(&mut rand::thread_rng());
         let password_hash = Argon2::new(
             Algorithm::Argon2id,

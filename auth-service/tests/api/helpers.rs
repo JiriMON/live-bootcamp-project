@@ -3,14 +3,9 @@ use sqlx::{postgres::{PgConnectOptions, PgPoolOptions}, Connection, Executor, Pg
 use tokio::sync::RwLock;
 use reqwest::cookie::Jar;
 use auth_service::{
-    app_state::{AppState, BannedTokenStoreType, TwoFACodeStoreType}, 
-    get_postgres_pool, 
-    services::{
-        hashmap_two_fa_code_store::HashmapTwoFACodeStore, 
-        hashset_banned_token_store::HashsetBannedTokenStore, 
-        mock_email_client::MockEmailClient, 
-        postgres_user_store::PostgresUserStore
-    }, utils::constants::DATABASE_URL, Application
+    app_state::{AppState, BannedTokenStoreType, TwoFACodeStoreType}, get_postgres_pool, get_redis_client, services::{
+        hashmap_two_fa_code_store::HashmapTwoFACodeStore, hashmap_user_store::HashmapUserStore, hashset_banned_token_store::HashsetBannedTokenStore, mock_email_client::MockEmailClient, postgres_user_store::PostgresUserStore, redis_banned_token_store::RedisBannedTokenStore
+    }, utils::constants::{prod::APP_ADDRESS, test, DATABASE_URL, DEFAULT_REDIS_HOSTNAME}, Application
 };
 use uuid::Uuid;
 
@@ -29,12 +24,22 @@ impl TestApp {
         let (pg_pool,db_name) = configure_postgresql().await;
         //let user_store = Arc::new(RwLock::new(HashmapUserStore::default()));
         let user_store = Arc::new(RwLock::new(PostgresUserStore::new(pg_pool)));
-        let banned_token_store= Arc::new(RwLock::new(HashsetBannedTokenStore::default()));
+        
+        let redis_conn = Arc::new(RwLock::new(configure_redis()));
+        //let banned_token_store= Arc::new(RwLock::new(HashsetBannedTokenStore::default()));
+        let banned_token_store= Arc::new(RwLock::new(RedisBannedTokenStore::new(redis_conn)));
         let two_fa_code_store = Arc::new(RwLock::new(HashmapTwoFACodeStore::default()));
+        
         let email_client = Arc::new(RwLock::new(MockEmailClient));
 
-        let app_state = AppState::new(user_store,banned_token_store.clone(),two_fa_code_store.clone(),email_client.clone());
-        let app = Application::build(app_state, "127.0.0.1:0")
+        let app_state = AppState::new(
+            user_store,
+            banned_token_store.clone(),
+            two_fa_code_store.clone(),
+            email_client
+        );
+
+        let app = Application::build(app_state, test::APP_ADDRESS)
             .await
             .expect("Failed to build app");
 
@@ -228,3 +233,10 @@ async fn delete_database(db_name: &str) {
         .expect("Failed to drop the database.");
 }
 
+fn configure_redis() -> redis::Connection {
+
+    get_redis_client(DEFAULT_REDIS_HOSTNAME.to_owned())
+        .expect("Failed to get Redis client")
+        .get_connection()
+        .expect("Failed to get Redis connection")
+}

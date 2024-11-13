@@ -11,6 +11,7 @@ use tower_http::{cors::CorsLayer, services::ServeDir};
 use app_state::AppState;
 use domain::AuthAPIError;
 use serde::{Deserialize, Serialize};
+use redis::{Client, RedisResult};
 
 pub mod routes;
 pub mod domain;
@@ -32,6 +33,7 @@ impl Application {
             "http://localhost:8000".parse()?,
             // TODO: Replace [YOUR_DROPLET_IP] with your Droplet IP address
             "http://auth.gmpautomation.cz:8000".parse()?,
+            "https://auth.gmpautomation.cz/app".parse()?,
         ];
   
         let cors = CorsLayer::new()
@@ -96,8 +98,11 @@ impl IntoResponse for AuthAPIError {
 
 pub async fn get_postgres_pool(url: &str) -> Result<PgPool, sqlx::Error> {
     // Create a new PostgreSQL connection pool
-    PgPoolOptions::new().max_connections(5).connect(url).await
+    PgPoolOptions::new().max_connections(20).connect(url).await
 }
 
-
+pub fn get_redis_client(redis_hostname: String) -> RedisResult<Client> {
+    let redis_url = format!("redis://{}/", redis_hostname);
+    redis::Client::open(redis_url)
+}
 

@@ -74,7 +74,7 @@ async fn should_return_206_if_valid_credentials_and_2fa_enabled() {
 
     // assert that `json_body.login_attempt_id` is stored inside `app.two_fa_code_store`
     {
-        let two_fa_code_store = app.two_fa_code_store.read().await;
+        let two_fa_code_store = app.two_fa_code_store.write().await;
 
         let code_tuple = two_fa_code_store
             .get_code(&Email::parse(random_email).unwrap())
