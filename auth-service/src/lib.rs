@@ -31,7 +31,7 @@ impl Application {
     pub async fn build(app_state: AppState, address: &str) -> Result<Self, Box<dyn Error>> {
         let allowed_origins = [
             "http://localhost:8000".parse()?,
-            // TODO: Replace [YOUR_DROPLET_IP] with your Droplet IP address
+            //Replace [YOUR_DROPLET_IP] with your Droplet IP address
             "http://auth.gmpautomation.cz:8000".parse()?,
             "https://auth.gmpautomation.cz/app".parse()?,
         ];
