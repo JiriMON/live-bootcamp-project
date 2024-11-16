@@ -12,7 +12,7 @@ use auth_service::{
         redis_banned_token_store::RedisBannedTokenStore, 
         redis_two_fa_code_store::RedisTwoFACodeStore
     }, 
-    utils::constants::{prod, DATABASE_URL, REDIS_HOST_NAME}, 
+    utils::{constants::{prod, DATABASE_URL, REDIS_HOST_NAME}, tracing::init_tracing}, 
     Application
 };
 
@@ -20,21 +20,8 @@ use auth_service::{
 async fn main() {
       // construct a subscriber that prints formatted traces to stdout
       // Start configuring a `fmt` subscriber
-      let subscriber = tracing_subscriber::fmt()
-            // Use a more compact, abbreviated log format
-            .compact()
-            // Display source code file paths
-            .with_file(true)
-            // Display source code line numbers
-            .with_line_number(true)
-            // Display the thread ID an event was recorded on
-            .with_thread_ids(true)
-            // Don't display the event's target (module path)
-            .with_target(false)
-            // Build the subscriber
-            .finish();
-      // use that subscriber to process traces emitted after this point
-      tracing::subscriber::set_global_default(subscriber).unwrap();
+    color_eyre::install().expect("Failed to install color_eyre");
+    init_tracing().expect("Failed to initialize tracing"); 
     // We will use this PostgreSQL pool in the next task! 
     let pg_pool = configure_postgresql().await;
     let redis_conn = Arc::new(RwLock::new(configure_redis()));
