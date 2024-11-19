@@ -22,9 +22,6 @@ impl TwoFACodeStore for HashmapTwoFACodeStore {
         code: TwoFACode,
     ) -> Result<(), TwoFACodeStoreError> {
         
-        if self.codes.contains_key(&email) {
-            return Err(TwoFACodeStoreError::UnexpectedError);
-        }
         self.codes.insert(email,(login_attempt_id,code));
         Ok(())
     }
@@ -45,7 +42,7 @@ impl TwoFACodeStore for HashmapTwoFACodeStore {
     async fn remove_code(&mut self, email: &Email) -> Result<(), TwoFACodeStoreError> {
         match self.codes.remove(&email) {
             Some(_) => Ok(()),
-            None    => Err(TwoFACodeStoreError::UnexpectedError)
+            None    => Err(TwoFACodeStoreError::LoginAttemptIdNotFound)
         }
     }
 }
@@ -57,16 +54,17 @@ mod tests {
     
     #[tokio::test]
     async fn test_add_code() {
-        let mut two_fa_store = HashmapTwoFACodeStore::default();
-        let code: (Email, LoginAttemptId, TwoFACode) = (Email::parse("test@xy.com".to_owned()).unwrap(),LoginAttemptId::default(),TwoFACode::default());
+        let mut store = HashmapTwoFACodeStore::default();
+        let email = Email::parse("test@example.com".to_owned()).unwrap();
+        let login_attempt_id = LoginAttemptId::default();
+        let code = TwoFACode::default();
 
+        let result = store
+            .add_code(email.clone(), login_attempt_id.clone(), code.clone())
+            .await;
 
-        let result = two_fa_store.add_code(code.0.clone(),code.1.clone(),code.2.clone()).await;
         assert!(result.is_ok());
-
-
-        let result = two_fa_store.add_code(code.0,code.1,code.2).await;
-        assert_eq!(result, Err(TwoFACodeStoreError::UnexpectedError));
+        assert_eq!(store.codes.get(&email), Some(&(login_attempt_id, code)));
     }
 
     #[tokio::test]

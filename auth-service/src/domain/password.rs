@@ -1,14 +1,15 @@
+use color_eyre::eyre::{eyre, Result};
 use validator::validate_length;
 
 #[derive(Debug, Clone, PartialEq, Hash, Eq)]
 pub struct Password(String);
 
 impl Password {
-    pub fn parse(s: String) -> Result<Password, String> {
+    pub fn parse(s: String) -> Result<Password> {
         if validate_length(&s,Some(8),None, None) {
             Ok(Self(s))
         } else {
-            Err(format!("{} is not a valid password.", s))
+            Err(eyre!(format!("{} is not a valid password.",s)))
         }
     }
 }

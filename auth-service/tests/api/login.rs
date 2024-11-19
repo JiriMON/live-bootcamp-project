@@ -8,6 +8,7 @@ use auth_service::{
 
 
 #[tokio::test]
+#[tracing::instrument(name = "Login", skip_all)]
 async fn should_return_200_if_valid_credentials_and_2fa_disabled() {
     let mut app = TestApp::new().await;
 
@@ -41,7 +42,8 @@ async fn should_return_200_if_valid_credentials_and_2fa_disabled() {
     app.clean_up().await;
 }
 
-/* #[tokio::test]
+#[tokio::test]
+#[tracing::instrument(name = "Login", skip_all)]
 async fn should_return_206_if_valid_credentials_and_2fa_enabled() {
     let mut app = TestApp::new().await;
 
@@ -59,10 +61,11 @@ async fn should_return_206_if_valid_credentials_and_2fa_enabled() {
 
     let login_body = serde_json::json!({
         "email": random_email,
-        "password": "password123",
+        "password": "password123"
     });
 
     let response = app.post_login(&login_body).await;
+
     assert_eq!(response.status().as_u16(), 206);
 
     let json_body = response
@@ -70,9 +73,7 @@ async fn should_return_206_if_valid_credentials_and_2fa_enabled() {
         .await
         .expect("Could not deserialize response body to TwoFactorAuthResponse");
 
-    assert_eq!(json_body.message, "Two factor authentification required".to_owned());
-
-    // assert that `json_body.login_attempt_id` is stored inside `app.two_fa_code_store`
+    assert_eq!(json_body.message, "2FA required".to_owned());
     {
         let two_fa_code_store = app.two_fa_code_store.read().await;
 
@@ -80,28 +81,35 @@ async fn should_return_206_if_valid_credentials_and_2fa_enabled() {
             .get_code(&Email::parse(random_email).unwrap())
             .await
             .expect("Failed to get 2FA code");
-        
+
         assert_eq!(code_tuple.0.as_ref(), json_body.login_attempt_id);
     }
     app.clean_up().await;
-}*/
+}
 
 #[tokio::test]
+#[tracing::instrument(name = "Login", skip_all)]
 async fn should_return_422_if_malformed_credentials() {
     let mut app = TestApp::new().await;
     let random_email = get_random_email();
+
+    let signup_body = serde_json::json!({
+        "email": random_email,
+        "password": "password123",
+        "requires2FA": true
+    });
+
+    let response = app.post_signup(&signup_body).await;
+    assert_eq!(response.status().as_u16(), 201);
 
     let test_cases = [
        serde_json::json!({
             "password": "password123",
         }),
         serde_json::json!({
-            "email": "",
-            "passord": "",
+            "email": random_email,
         }),
-       serde_json::json!({
-          "email": random_email,
-        })
+       serde_json::json!({})
     ];
     for test_case in test_cases.iter() {
         let response = app.post_login(test_case).await; // call `post_login`
@@ -116,6 +124,7 @@ async fn should_return_422_if_malformed_credentials() {
 } 
 
 #[tokio::test]
+#[tracing::instrument(name = "Login", skip_all)]
 async fn should_return_400_if_invalid_input() {
     // Call the log-in route with invalid credentials and assert that a
     // 400 HTTP status code is returned along with the appropriate error message. 
@@ -123,9 +132,19 @@ async fn should_return_400_if_invalid_input() {
 
     let random_email = get_random_email();
 
+    let signup_body = serde_json::json!({
+        "email": random_email,
+        "password": "password123",
+        "requires2FA": false
+    });
+
+    let response = app.post_signup(&signup_body).await;
+
+    assert_eq!(response.status().as_u16(), 201);
+
     let input = [
         serde_json::json!({
-            "email": "",
+            "email": "ssss",
             "password": "password123",
         }),
         serde_json::json!({
@@ -134,8 +153,8 @@ async fn should_return_400_if_invalid_input() {
             "requires2FA": true
         }),
         serde_json::json!({
-            "email": "",
-            "password": "",
+            "email": "x@y.cz",
+            "password": "abc",
             "requires2FA": true
         }),
         serde_json::json!({
@@ -167,6 +186,7 @@ async fn should_return_400_if_invalid_input() {
 }
 
 #[tokio::test]
+#[tracing::instrument(name = "Login", skip_all)]
 async fn should_return_401_if_incorrect_credentials() {
     // Call the log-in route with incorrect credentials and assert
     // that a 401 HTTP status code is returned along with the appropriate error message.     
@@ -174,13 +194,30 @@ async fn should_return_401_if_incorrect_credentials() {
 
     let random_email = get_random_email();
 
-    let input = [
+    let signup_body = 
         serde_json::json!({
             "email": random_email,
             "password": "password123",
+            "requires2FA": false,
+        });
+    
+    let response = app.post_signup(&signup_body).await;
+
+    assert_eq!(response.status().as_u16(), 201);
+    let input = [
+        serde_json::json!({
+            "email": random_email,
+            "password": "password",
+        }),
+        serde_json::json!({
+            "email": "test@email.com",
+            "password": "password123",
+            
         }),
     ];
-    
+
+
+
     for i in input.iter() {
         let response = app.post_login(i).await;
         assert_eq!(response.status().as_u16(), 401, "Failed for input: {:?}", i);

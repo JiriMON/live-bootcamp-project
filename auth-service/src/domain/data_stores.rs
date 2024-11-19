@@ -2,7 +2,6 @@ use crate::domain::{Email,Password,TwoFACode,LoginAttemptId};
 use super::User;
 
 use color_eyre::eyre::Report;
-use rand::Rng;
 use thiserror::Error;
 
 //...
@@ -41,10 +40,10 @@ pub trait UserStore {
     async fn validate_user(&self, email: &Email, password: &Password) -> Result<(), UserStoreError>;
 }
 
-#[derive(Debug, PartialEq)]
-pub enum BannedTokenStoreError{
-    TokenAlreadyBanned,
-    UnexpectedError,
+#[derive(Debug, Error)]
+pub enum BannedTokenStoreError {
+    #[error("Unexpected error")]
+    UnexpectedError(#[source] Report),
 }
 
 #[async_trait::async_trait]
@@ -55,11 +54,26 @@ pub trait BannedTokenStore {
 
 
 
-#[derive(Debug, PartialEq)]
+#[derive(Debug, Error)]
 pub enum TwoFACodeStoreError {
+    #[error("Login Attempt ID not found")]
     LoginAttemptIdNotFound,
-    UnexpectedError,
+    #[error("Unexpected error")]
+    UnexpectedError(#[source] Report),
 }
+
+impl PartialEq for TwoFACodeStoreError {
+    fn eq(&self, other: &Self) -> bool {
+        matches!(
+            (self, other),
+            (Self::LoginAttemptIdNotFound, Self::LoginAttemptIdNotFound)
+                | (Self::UnexpectedError(_), Self::UnexpectedError(_))
+        )
+    }
+}
+
+
+
 // This trait represents the interface all concrete 2FA code stores should implement
 #[async_trait::async_trait]
 pub trait TwoFACodeStore {

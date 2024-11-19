@@ -1,11 +1,10 @@
-use std::error::Error;
 use argon2::{
     password_hash::SaltString, Algorithm, Argon2, Params, PasswordHash, PasswordHasher,
     PasswordVerifier, Version,
 };
 use sqlx::PgPool;
 use tokio::task;
-use color_eyre::eyre::{eyre, Context, Result};
+use color_eyre::eyre::{eyre, Result};
 use crate::domain::{
     data_stores::{UserStore, UserStoreError},
     Email, Password, User,
