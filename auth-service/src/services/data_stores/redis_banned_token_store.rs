@@ -5,8 +5,7 @@ use redis::{Commands, Connection};
 use tokio::sync::RwLock;
 
 use crate::{
-    domain::data_stores::{BannedTokenStore, BannedTokenStoreError},
-    utils::auth::TOKEN_TTL_SECONDS,
+    domain::data_stores::{BannedTokenStore, BannedTokenStoreError}, utils::auth::TOKEN_TTL_SECONDS
 };
 
 pub struct RedisBannedTokenStore {

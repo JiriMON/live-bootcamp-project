@@ -36,7 +36,7 @@ async fn verify_2fa_returns_200() {
         .await
         .expect("Could not deserialize response body to TwoFactorAuthResponse");
     
-    assert_eq!(json_body.message, "Two factor authentification required".to_owned());
+    assert_eq!(json_body.message, "2FA required".to_owned());
 
     // assert that `json_body.login_attempt_id` is stored inside `app.two_fa_code_store`
  
@@ -102,7 +102,7 @@ async fn should_return_400_if_invalid_input() {
         .await
         .expect("Could not deserialize response body to TwoFactorAuthResponse");
 
-    assert_eq!(json_body.message, "Two factor authentification required".to_owned());
+    assert_eq!(json_body.message, "2FA required".to_owned());
 
     // assert that `json_body.login_attempt_id` is stored inside `app.two_fa_code_store`
 
@@ -169,7 +169,7 @@ async fn should_return_401_if_incorrect_credentials() {
         .await
         .expect("Could not deserialize response body to TwoFactorAuthResponse");
 
-    assert_eq!(json_body.message, "Two factor authentification required".to_owned());
+    assert_eq!(json_body.message, "2FA required".to_owned());
 
     // assert that `json_body.login_attempt_id` is stored inside `app.two_fa_code_store`
  
@@ -237,7 +237,7 @@ async fn should_return_401_if_old_code() {
         .await
         .expect("Could not deserialize response body to TwoFactorAuthResponse");
 
-    assert_eq!(json_body.message, "Two factor authentification required".to_owned());
+    assert_eq!(json_body.message, "2FA required".to_owned());
 
     // assert that `json_body.login_attempt_id` is stored inside `app.two_fa_code_store`
 

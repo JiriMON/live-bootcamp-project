@@ -23,9 +23,9 @@ chrono = "0.4.35"
 dotenvy = "0.15.7"
 lazy_static = "1.4.0"
 rand = "0.8.5"
-sqlx = { version = "0.8", features = [ "runtime-tokio-rustls", "postgres", "migrate"] }
+sqlx = { version = "0.8.2", features = [ "runtime-tokio-rustls", "postgres", "migrate"] }
 argon2 = { version = "0.5.3", features = ["std"] }
-redis = { version = "0.25.2", features = ["tokio-comp"] }
+redis = { version = "0.27.5", features = ["tokio-comp"] }
 thiserror = "1.0.58"
 color-eyre = "0.6.3"
 

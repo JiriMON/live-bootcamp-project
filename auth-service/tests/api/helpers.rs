@@ -26,7 +26,7 @@ pub struct TestApp {
     pub two_fa_code_store: TwoFACodeStoreType,
     pub http_client: reqwest::Client, 
     pub db_name: String,
-    //pub clean_up_called: bool,
+    pub clean_up_called: bool,
 }
 
 impl TestApp {
@@ -79,17 +79,17 @@ impl TestApp {
             two_fa_code_store,
             http_client,
             db_name,
-            //clean_up_called: false,
+            clean_up_called: false,
         }
     }
 
-/*     pub async fn clean_up (&mut self){ 
+     pub async fn clean_up (&mut self){ 
         if self.clean_up_called {
             return;
         }
-        //delete_database(&self.db_name).await;
+        delete_database(&self.db_name).await;
         self.clean_up_called = true;
-    } */
+    } 
 
     pub async fn get_root(&self) -> reqwest::Response {
         self.http_client
@@ -156,13 +156,13 @@ impl TestApp {
     }
 }
 
-/* impl Drop for TestApp {
+impl Drop for TestApp {
     fn drop(&mut self) {
         if !self.clean_up_called {
             panic!("TestApp::clean_up was not called before dropping TestApp");
         }
     }
-} */
+}
 
 pub fn get_random_email() -> String {
     format!("{}@example.com", Uuid::new_v4())
@@ -173,9 +173,7 @@ async fn configure_postgresql() -> (PgPool, String) {
 
     // We are creating a new database for each test case, and we need to ensure each database has a unique name!
     let db_name = Uuid::new_v4().to_string();
-    println!("-------------------------1-----------------------");
     configure_database(&postgresql_conn_url, &db_name).await;
-    println!("-------------------------2-----------------------");
     let postgresql_conn_url_with_db = format!("{}/{}", postgresql_conn_url, db_name);
 
     // Create a new connection pool and return it
@@ -187,33 +185,26 @@ async fn configure_postgresql() -> (PgPool, String) {
 
 async fn configure_database(db_conn_string: &str, db_name: &str) {
     // Create database connection
-    println!("-------------------------1.1-----------------------");
     let connection = PgPoolOptions::new()
         .connect(db_conn_string)
         .await
         .expect("Failed to create Postgres connection pool.");
-    println!("-------------------------1.2-----------------------");
     // Create a new database
     connection
         .execute(format!(r#"CREATE DATABASE "{}";"#, db_name).as_str())
         .await
         .expect("Failed to create database.");
-
-        println!("-------------------------1.3-----------------------");
     // Connect to new database
     let db_conn_string = format!("{}/{}", db_conn_string, db_name);
-    println!("-------------------------1.4-----------------------");
     let connection = PgPoolOptions::new()
         .connect(&db_conn_string)
         .await
         .expect("Failed to create Postgres connection pool.");
-    println!("-------------------------1.5-----------------------");
     // Run migrations against new database
     sqlx::migrate!()
         .run(&connection)
         .await
         .expect("Failed to migrate the database");
-    println!("-------------------------1.6-----------------------");
 }
 
 async fn delete_database(db_name: &str) {

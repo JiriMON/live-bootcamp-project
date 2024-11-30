@@ -1,4 +1,4 @@
-use auth_service::domain::{login_attempt_id, two_fa_code, Email, LoginAttemptId, TwoFACode};
+use auth_service::domain::{Email, LoginAttemptId, TwoFACode};
 
 use crate::helpers::TestApp;
 
@@ -22,17 +22,17 @@ async fn redis_returns_stored_token() {
 }
 
 #[tokio::test]
-async fn redis_store_and_retur_2fa() {
+async fn redis_store_and_return_2fa() {
     let mut app = TestApp::new().await;
     let email = Email::parse("a@b.cz".to_string()).unwrap();
-    let login_attempt_id = LoginAttemptId::parse("6d82d96a-09d6-46d5-bf74-6e57b502637f".to_string()).unwrap();
-    let two_fa_code = TwoFACode::parse("123456".to_string()).unwrap();
+    let login_attempt_id = LoginAttemptId::parse("ecd1ae84-a1ec-442e-befb-adb57a953d7e".to_string()).unwrap();
+    let two_fa_code = TwoFACode::parse("987767".to_string()).unwrap();
     {
         let mut  two_fa_store = app.two_fa_code_store.write().await;
         
-        let _ = two_fa_store.add_code(email.clone(), login_attempt_id, two_fa_code).await;
+        let _ = two_fa_store.add_code(email.clone(), login_attempt_id.clone(), two_fa_code.clone()).await;
         match two_fa_store.get_code(&email).await {
-            Ok((login_attempt_id2, code2)) => assert_eq!(login_attempt_id2,login_attempt_id),
+            Ok((login_attempt_id2, code2)) => assert_eq!((login_attempt_id2.to_owned(),code2),(login_attempt_id,two_fa_code)),
             Err(_) => return
         }
         

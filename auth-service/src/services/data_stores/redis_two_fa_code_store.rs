@@ -37,7 +37,7 @@ impl TwoFACodeStore for RedisTwoFACodeStore {
         let serialized_data = serde_json::to_string(&data)
             .wrap_err("failed to serialize 2FA tuple") // New!
             .map_err(TwoFACodeStoreError::UnexpectedError)?; // Updated!
-
+        println!("{}",serialized_data);
         let _: () = self
             .conn
             .write()

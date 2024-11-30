@@ -14,6 +14,7 @@ use auth_service::{
     }, 
     utils::{constants::{prod, DATABASE_URL, REDIS_HOST_NAME}, tracing::init_tracing}, 
     Application
+    
 };
 
 #[tokio::main]

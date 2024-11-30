@@ -12,7 +12,8 @@ async fn logout_returns_200() {
     assert_eq!(response.status().as_u16(), 200);
 } */
 
-/* #[tokio::test]
+
+#[tokio::test]
 async fn should_return_200_if_valid_jwt_cookie() {
     let mut app = TestApp::new().await;
 
@@ -67,7 +68,8 @@ async fn should_return_200_if_valid_jwt_cookie() {
     app.clean_up().await;
     
 }
- */
+
+
 #[tokio::test]
 async fn should_return_400_if_logout_called_twice_in_a_row() {
     let mut app = TestApp::new().await;
@@ -119,7 +121,7 @@ async fn should_return_400_if_logout_called_twice_in_a_row() {
             .await
             .expect("Could not deserialize response body to ErrorResponse")
             .error,
-        "Missing auth token".to_owned()
+        "Missing token credentials".to_owned()
     );
 
     app.clean_up().await;
@@ -149,7 +151,7 @@ async fn should_return_400_if_jwt_cookie_missing() {
             .await
             .expect("Could not deserialize response body to ErrorResponse")
             .error,
-        "Missing auth token".to_owned()
+        "Missing token credentials".to_owned()
     );
 
     app.clean_up().await;
@@ -183,7 +185,7 @@ async fn should_return_401_if_invalid_token() {
             .await
             .expect("Could not deserialize response body to ErrorResponse")
             .error,
-        "Invalid auth token".to_owned()
+        "InvalidToken".to_owned()
     );
 
     app.clean_up().await;
