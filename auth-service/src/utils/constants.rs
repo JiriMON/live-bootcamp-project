@@ -24,7 +24,8 @@ fn set_token() -> String {
 
 fn set_database_url() -> String {
     dotenv().ok(); // Load environment variables
-    let secret = std_env::var(env::DATABASE_URL_ENV_VAR).expect("DATABASE URL must be set.");
+    let secret = std_env::var(env::DATABASE_URL_ENV_VAR).unwrap_or(DEFAULT_POSTGRES_URL.to_owned());
+    //.expect("DATABASE URL must be set.");
     if secret.is_empty() {
         panic!("DATABASE URL must not be empty.");
     }
@@ -44,7 +45,7 @@ pub mod env {
 
 pub const JWT_COOKIE_NAME: &str = "jwt";
 pub const DEFAULT_REDIS_HOSTNAME: &str = "127.0.0.1";
-
+pub const DEFAULT_POSTGRES_URL: &str = "postgres://postgres:eQR8fbY6uO6PAE@127.0.0.1:5432";
 pub mod prod {
     pub const APP_ADDRESS: &str = "0.0.0.0:3000";
 }
